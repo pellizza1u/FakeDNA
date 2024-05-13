@@ -7,16 +7,27 @@ namespace FakeDNA.Models
         public ICollection<TimeOff> TimeOffs { get; } = [];
         public double PaidLeaveTotal { get; set; }
         public double CompensationLeaveTotal { get; set; }
-        public double PaidLeaveAmount => (from leave in TimeOffs
-                                          where !new[] { TimeOffStatus.Cancelled, TimeOffStatus.Rejected }.Contains(leave.Status) && leave.Reason == TimeOffReason.PaidLeave
-                                          select leave).Count();
-        public double CompensationLeaveAmount => (from leave in TimeOffs
-                                                  where !new[] { TimeOffStatus.Cancelled, TimeOffStatus.Rejected }.Contains(leave.Status) && leave.Reason == TimeOffReason.HolidayCompensation
-                                                  select leave).Count();
-        public double SickLeaveAmount => (from leave in TimeOffs
-                                          where !new[] { TimeOffStatus.Cancelled, TimeOffStatus.Rejected }.Contains(leave.Status) && leave.Reason == TimeOffReason.SickLeave
-                                          select leave).Count();
+
+        public double PaidLeaveAmount => TimeOffs
+            .Where(leave => leave.Status != TimeOffStatus.Cancelled && 
+                            leave.Status != TimeOffStatus.Rejected && 
+                            leave.Reason == TimeOffReason.PaidLeave)
+            .Count();
+
+        public double CompensationLeaveAmount => TimeOffs
+            .Where(leave => leave.Status != TimeOffStatus.Cancelled && 
+                            leave.Status != TimeOffStatus.Rejected && 
+                            leave.Reason == TimeOffReason.HolidayCompensation)
+            .Count();
+
+        public double SickLeaveAmount => TimeOffs
+            .Where(leave => leave.Status != TimeOffStatus.Cancelled && 
+                            leave.Status != TimeOffStatus.Rejected && 
+                            leave.Reason == TimeOffReason.SickLeave)
+            .Count();
+
         public double PaidLeaveRemaining => PaidLeaveTotal - PaidLeaveAmount;
         public double CompensationLeaveRemaining => CompensationLeaveTotal - CompensationLeaveAmount;
+
     }
 }
